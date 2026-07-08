@@ -54,8 +54,8 @@ export default async function DashboardPage() {
       title: 'Live Translation',
       description: 'Get real-time transcription and speech translations with explicit consent.',
       icon: Languages,
-      status: 'Coming Soon',
-      link: '',
+      status: 'Active',
+      link: '/dashboard/translation',
     },
   ];
 
