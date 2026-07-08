@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Job Finder Agent - Sync Helper",
+  "version": "1.0.0",
+  "description": "Sync LinkedIn job postings and recruiter messages straight to your Job Finder Agent Kanban Board.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["https://www.linkedin.com/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
