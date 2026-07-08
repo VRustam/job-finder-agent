@@ -377,6 +377,34 @@ export default function InterviewCoachPage() {
                 );
               })}
             </div>
+
+            {/* Back & Restart Actions */}
+            <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => {
+                  setActiveSession(null);
+                  setJobTitle('');
+                  setJobDescription('');
+                }}
+                className="flex-1 py-3 bg-neutral-900 dark:bg-neutral-50 hover:bg-neutral-850 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 font-bold rounded-xl text-xs active:scale-[0.98] transition-all text-center"
+              >
+                Start New Practice Session
+              </button>
+              <button
+                onClick={() => {
+                  const title = activeSession.job_title;
+                  const desc = activeSession.job_description || '';
+                  const resume = activeSession.resume_id || '';
+                  setActiveSession(null);
+                  setJobTitle(title);
+                  setJobDescription(desc);
+                  setSelectedResumeId(resume);
+                }}
+                className="flex-1 py-3 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-750 dark:text-neutral-300 font-bold rounded-xl text-xs active:scale-[0.98] transition-all text-center"
+              >
+                Practice This Role Again
+              </button>
+            </div>
           </div>
         </DashboardShell>
       );
