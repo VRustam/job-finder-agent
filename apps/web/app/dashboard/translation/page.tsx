@@ -48,6 +48,7 @@ export default function TranslationPage() {
   const [copiedTranslation, setCopiedTranslation] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [browserSupported, setBrowserSupported] = useState(true);
+  const [showExtensionHelp, setShowExtensionHelp] = useState(false);
 
   const recognitionRef = useRef<any>(null);
 
@@ -243,10 +244,43 @@ export default function TranslationPage() {
   return (
     <DashboardShell userEmail={userEmail}>
       {/* Top Header */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Live Translation & Transcription</h2>
-        <p className="text-sm text-neutral-500 mt-1">Practice speaking in your native tongue and get polished, interview-grade English translations.</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Live Translation & Transcription</h2>
+          <p className="text-sm text-neutral-500 mt-1">Practice speaking in your native tongue and get polished, interview-grade English translations.</p>
+        </div>
+        <button
+          onClick={() => setShowExtensionHelp(!showExtensionHelp)}
+          className="flex items-center gap-1.5 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-bold text-neutral-700 dark:text-neutral-350 hover:bg-neutral-100 dark:hover:bg-neutral-805 transition-all cursor-pointer"
+        >
+          <Languages className="w-4 h-4 text-purple-500" />
+          {showExtensionHelp ? 'Hide Extension Guide' : 'Install Chrome Helper'}
+        </button>
       </div>
+
+      {showExtensionHelp && (
+        <div className="mb-8 p-6 bg-gradient-to-r from-purple-900/10 via-blue-900/10 to-transparent border border-purple-500/20 rounded-2xl space-y-4">
+          <h3 className="text-sm font-bold text-purple-650 dark:text-purple-400">✦ LinkedIn & Highlight-to-Translate Chrome Extension</h3>
+          <p className="text-xs text-neutral-550 dark:text-neutral-400 leading-relaxed max-w-3xl">
+            We built a custom Chrome Extension helper that integrates with LinkedIn to sync job descriptions, suggest outreach replies, and translate selected webpage text right on the spot!
+          </p>
+          <div className="space-y-2 text-xs">
+            <h4 className="font-bold text-neutral-800 dark:text-white">How to Install in Chrome:</h4>
+            <ol className="list-decimal pl-4 space-y-1.5 text-neutral-600 dark:text-neutral-400 font-medium">
+              <li>Open <strong>chrome://extensions/</strong> in your Google Chrome browser.</li>
+              <li>Toggle <strong>Developer mode</strong> (top-right corner) to ON.</li>
+              <li>Click the <strong>Load unpacked</strong> button (top-left corner).</li>
+              <li>Select the extension folder inside this project directory: <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono text-[10px]">/Users/apple/Documents/apps/AI Career Agent/apps/extension</code></li>
+            </ol>
+          </div>
+          <div className="pt-2 text-xs border-t border-neutral-200/50 dark:border-neutral-800/30">
+            <h4 className="font-bold text-neutral-850 dark:text-white">✦ Inline Selection Translation Feature:</h4>
+            <p className="text-neutral-500 leading-relaxed mt-1 font-medium">
+              Once the extension is installed, go to any webpage (like LinkedIn). Highlight any English sentence or requirement with your mouse, and a small <strong>"✦ Translate"</strong> trigger will float right above it. Click it to view the professional translation popup inline instantly!
+            </p>
+          </div>
+        </div>
+      )}
 
       {!browserSupported && (
         <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30 rounded-2xl text-xs text-yellow-750 dark:text-yellow-400 font-semibold flex items-center gap-3">

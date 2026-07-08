@@ -220,3 +220,113 @@ function injectMessagingAssistant() {
     }
   });
 }
+
+// --- 3. HIGHLIGHT TO TRANSLATE TOOLTIP ---
+let activeTrigger = null;
+let activeTooltip = null;
+
+document.addEventListener('mouseup', (e) => {
+  // If clicked inside existing trigger or tooltip, do not clear
+  if (e.target.closest('.jf-floating-translate-trigger') || e.target.closest('.jf-floating-translate-tooltip')) {
+    return;
+  }
+
+  // Clear existing elements
+  removeFloatingElements();
+
+  const selection = window.getSelection();
+  const selectedText = selection ? selection.toString().trim() : '';
+
+  if (selectedText.length > 2) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+
+    // Create trigger button
+    const trigger = document.createElement('button');
+    trigger.className = 'jf-floating-translate-trigger';
+    trigger.innerHTML = '✦ Translate';
+    
+    // Position trigger right above the selected text
+    trigger.style.top = `${window.scrollY + rect.top - 32}px`;
+    trigger.style.left = `${window.scrollX + rect.left + (rect.width / 2) - 40}px`;
+
+    trigger.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      trigger.innerText = 'Translating...';
+      trigger.disabled = true;
+
+      const { serverUrl = 'http://localhost:3000' } = await chrome.storage.local.get('serverUrl');
+
+      try {
+        // Send request to translate endpoint.
+        // We instruct the API to auto-detect the language and translate to Azerbaijani for English text, or English for other text.
+        const res = await fetch(`${serverUrl}/api/translation/translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: selectedText,
+            sourceLang: 'auto-detect',
+            targetLang: 'Azerbaijani (or English if source is Azerbaijani)'
+          })
+        });
+
+        if (!res.ok) throw new Error('Translation failed');
+        const data = await res.json();
+
+        // Create and position tooltip
+        createTooltip(data.translatedText, rect);
+        removeTrigger();
+
+      } catch (err) {
+        console.error('[Job Finder Sync] Selection translation failed:', err);
+        trigger.innerText = 'Error!';
+        setTimeout(removeFloatingElements, 2000);
+      }
+    });
+
+    document.body.appendChild(trigger);
+    activeTrigger = trigger;
+  }
+});
+
+function createTooltip(text, targetRect) {
+  removeFloatingElements();
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'jf-floating-translate-tooltip animate-fade-in';
+  tooltip.innerHTML = `
+    <div class="jf-tooltip-header">
+      <span class="jf-tooltip-title">✦ AI Translation</span>
+      <button class="jf-tooltip-close">&times;</button>
+    </div>
+    <div class="jf-tooltip-content">${text}</div>
+  `;
+
+  // Position tooltip above selection
+  tooltip.style.top = `${window.scrollY + targetRect.top - 110}px`;
+  tooltip.style.left = `${window.scrollX + targetRect.left + (targetRect.width / 2) - 130}px`;
+
+  tooltip.querySelector('.jf-tooltip-close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    removeFloatingElements();
+  });
+
+  document.body.appendChild(tooltip);
+  activeTooltip = tooltip;
+}
+
+function removeTrigger() {
+  if (activeTrigger) {
+    activeTrigger.remove();
+    activeTrigger = null;
+  }
+}
+
+function removeFloatingElements() {
+  removeTrigger();
+  if (activeTooltip) {
+    activeTooltip.remove();
+    activeTooltip = null;
+  }
+}
+
