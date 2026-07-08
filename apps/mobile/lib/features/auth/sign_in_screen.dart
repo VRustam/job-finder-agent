@@ -96,20 +96,31 @@ class _SignInScreenState extends State<SignInScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo Placeholder
+                  // Logo
                   Align(
                     alignment: Alignment.center,
                     child: Container(
-                      width: 64,
-                      height: 64,
+                      width: 72,
+                      height: 72,
+                      padding: const EdgeInsets.all(6.0),
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.white : Colors.black,
-                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: Colors.grey.shade200, width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: Icon(
-                        Icons.auto_awesome,
-                        color: isDark ? Colors.black : Colors.white,
-                        size: 36,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),

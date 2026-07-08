@@ -34,9 +34,7 @@ export function DashboardShell({ children, userEmail, userName, authProvider }: 
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer">
-              <div className="w-9 h-9 rounded-lg bg-neutral-900 dark:bg-neutral-100 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white dark:text-neutral-900" />
-              </div>
+              <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-xs" />
               <span className="text-xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
                 Job Finder Agent
               </span>

@@ -8,9 +8,7 @@ export default function LandingPage() {
       <nav className="border-b border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-neutral-900 dark:bg-neutral-100 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white dark:text-neutral-900" />
-            </div>
+            <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-xs" />
             <span className="text-xl font-bold tracking-tight">Job Finder Agent</span>
           </div>
           <div className="flex items-center gap-4">
