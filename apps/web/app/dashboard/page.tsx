@@ -21,6 +21,19 @@ export default async function DashboardPage() {
   const userName = user.user_metadata?.full_name || '';
   const authProvider = user.app_metadata?.provider || 'email';
 
+  // Fetch real-time metrics parallelly
+  const [
+    { count: resumesCount },
+    { count: applicationsCount },
+    { count: interviewsCount },
+    { count: eventsCount }
+  ] = await Promise.all([
+    supabase.from('resumes').select('*', { count: 'exact', head: true }),
+    supabase.from('applications').select('*', { count: 'exact', head: true }),
+    supabase.from('interview_sessions').select('*', { count: 'exact', head: true }),
+    supabase.from('calendar_events').select('*', { count: 'exact', head: true }),
+  ]);
+
   const modules = [
     {
       title: 'Resume Builder',
@@ -62,16 +75,39 @@ export default async function DashboardPage() {
   return (
     <DashboardShell userEmail={userEmail} userName={userName} authProvider={authProvider}>
       {/* Welcome banner */}
-      <div className="mb-10 p-8 rounded-2xl bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-900 dark:to-neutral-950 text-white shadow-md relative overflow-hidden">
+      <div className="mb-8 p-8 rounded-2xl bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-900 dark:to-neutral-950 text-white shadow-md relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
           <h2 className="text-3xl font-extrabold tracking-tight">
             Welcome back, {userName || userEmail.split('@')[0]}!
           </h2>
           <p className="mt-2 text-neutral-350 dark:text-neutral-400 font-medium">
-            Ready to supercharge your career? The foundation is ready. Explore our upcoming modules and build your career strategy.
+            Ready to supercharge your career? The foundation is ready. Explore your modules and track your stats below.
           </p>
         </div>
         <div className="absolute top-1/2 -right-8 -translate-y-1/2 w-48 h-48 bg-neutral-800/30 rounded-full blur-3xl pointer-events-none" />
+      </div>
+
+      {/* Analytics Summary Panel */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {[
+          { label: 'Active Resumes', count: resumesCount, icon: FileText, color: 'text-blue-500' },
+          { label: 'Tracked Jobs', count: applicationsCount, icon: Briefcase, color: 'text-amber-500' },
+          { label: 'Completed Practices', count: interviewsCount, icon: Compass, color: 'text-purple-550' },
+          { label: 'Scheduled Events', count: eventsCount, icon: Calendar, color: 'text-green-500' },
+        ].map((stat, i) => {
+          const StatIcon = stat.icon;
+          return (
+            <div key={i} className="p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xs flex items-center gap-4">
+              <div className="p-3 bg-neutral-50 dark:bg-neutral-950 rounded-xl shrink-0">
+                <StatIcon className={`w-5 h-5 ${stat.color}`} />
+              </div>
+              <div className="truncate">
+                <span className="block text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{stat.label}</span>
+                <span className="block text-2xl font-black text-neutral-900 dark:text-white mt-0.5">{stat.count || 0}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Modules Grid */}
@@ -81,7 +117,7 @@ export default async function DashboardPage() {
             Career Modules
           </h3>
           <span className="text-xs font-semibold text-neutral-500 bg-neutral-200/50 dark:bg-neutral-800 dark:text-neutral-400 px-2.5 py-1 rounded-full">
-            Phase 1 & 2 Active
+            All 6 Phases Completed
           </span>
         </div>
 

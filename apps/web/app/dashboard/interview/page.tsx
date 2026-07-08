@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { DashboardShell } from '@/app/components/DashboardShell';
 import { 
   Compass, Play, Calendar, Star, CheckCircle, ChevronRight, 
-  Trash2, AlertCircle, ArrowLeft, Loader2, Sparkles, BookOpen, Send
+  Trash2, AlertCircle, ArrowLeft, Loader2, Sparkles, BookOpen, Send,
+  Mic, MicOff
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -64,6 +65,71 @@ export default function InterviewCoachPage() {
   const [currentFeedback, setCurrentFeedback] = useState<AnswerFeedback | null>(null);
   const [reviewMode, setReviewMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = React.useRef<any>(null);
+
+  const startSpeechRecognition = () => {
+    try {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Web Speech API is not supported in this browser. Please use Chrome or Safari.');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.onresult = (event: any) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (finalTranscript) {
+          setUserAnswer(prev => (prev + ' ' + finalTranscript).trim());
+        }
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+
+    } catch (err: any) {
+      console.error('Failed to start speech recognition', err);
+      setIsListening(false);
+    }
+  };
+
+  const stopSpeechRecognition = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -464,14 +530,29 @@ export default function InterviewCoachPage() {
           {/* Answer input area */}
           {!currentFeedback ? (
             <div className="space-y-4">
-              <textarea
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder="Type your response here... (Try to provide specific details or structure behavioral answers using the STAR method)"
-                rows={6}
-                disabled={submittingAnswer}
-                className="w-full p-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-2xl text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none resize-none leading-relaxed"
-              />
+              <div className="relative">
+                <textarea
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Type your response here... (Try to provide specific details or structure behavioral answers using the STAR method)"
+                  rows={6}
+                  disabled={submittingAnswer}
+                  className="w-full p-4 pr-14 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-2xl text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none resize-none leading-relaxed"
+                />
+                <button
+                  type="button"
+                  onClick={isListening ? stopSpeechRecognition : startSpeechRecognition}
+                  disabled={submittingAnswer}
+                  className={`absolute right-4 bottom-4 p-2.5 rounded-full transition-all border ${
+                    isListening
+                      ? 'bg-red-500 hover:bg-red-650 text-white border-red-500 animate-pulse'
+                      : 'bg-neutral-50 dark:bg-neutral-950 border-neutral-350 dark:border-neutral-800 text-neutral-550 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-900'
+                  }`}
+                  title={isListening ? 'Stop recording' : 'Speak your answer'}
+                >
+                  {isListening ? <MicOff className="w-5.5 h-5.5" /> : <Mic className="w-5.5 h-5.5" />}
+                </button>
+              </div>
               <button
                 onClick={handleSubmitAnswer}
                 disabled={submittingAnswer || !userAnswer.trim()}
