@@ -47,8 +47,8 @@ export default async function DashboardPage() {
       title: 'Interview Coach',
       description: 'Simulate behavioral and technical interviews with personalized feedback.',
       icon: Compass,
-      status: 'Coming Soon',
-      link: '',
+      status: 'Active',
+      link: '/dashboard/interview',
     },
     {
       title: 'Live Translation',
