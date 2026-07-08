@@ -40,8 +40,8 @@ export default async function DashboardPage() {
       title: 'Calendar Scheduler',
       description: 'Coordinate availabilities and plan mock interviews around your calendar.',
       icon: Calendar,
-      status: 'Coming Soon',
-      link: '',
+      status: 'Active',
+      link: '/dashboard/calendar',
     },
     {
       title: 'Interview Coach',
