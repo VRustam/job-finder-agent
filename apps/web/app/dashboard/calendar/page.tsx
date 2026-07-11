@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { DashboardShell } from '@/app/components/DashboardShell';
 import { 
   Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, 
-  Trash2, Link as LinkIcon, Clock, AlertCircle, X, Loader2, MapPin
+  Trash2, Link as LinkIcon, Clock, AlertCircle, X, Loader2
 } from 'lucide-react';
 
 interface CalendarEvent {
@@ -71,7 +71,7 @@ export default function CalendarPage() {
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-  const [selectedDateStr, setSelectedDateStr] = useState('');
+
 
   // Event form states
   const [eventTitle, setEventTitle] = useState('');
@@ -135,8 +135,6 @@ export default function CalendarPage() {
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
     const dayStr = String(day).padStart(2, '0');
     const dateStr = `${year}-${month}-${dayStr}`;
-    
-    setSelectedDateStr(dateStr);
     
     // Default start/end times
     setEventTitle('');
@@ -241,8 +239,8 @@ export default function CalendarPage() {
         }
       }
       setIsModalOpen(false);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to save event.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'Failed to save event.');
     } finally {
       setSavingEvent(false);
     }
@@ -265,8 +263,8 @@ export default function CalendarPage() {
 
       setEvents(prev => prev.filter(item => item.id !== selectedEvent.id));
       setIsModalOpen(false);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to delete event.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'Failed to delete event.');
     } finally {
       setDeletingEvent(false);
     }
@@ -546,7 +544,7 @@ export default function CalendarPage() {
                 </label>
                 <select
                   value={eventType}
-                  onChange={(e) => setEventType(e.target.value as any)}
+                  onChange={(e) => setEventType(e.target.value as CalendarEvent['event_type'])}
                   className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-xs font-bold text-neutral-900 dark:text-neutral-100 focus:outline-none"
                 >
                   <option value="interview">Interview Invitation</option>

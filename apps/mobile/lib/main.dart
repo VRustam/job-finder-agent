@@ -12,7 +12,7 @@ void main() async {
       'SUPABASE_URL',
       defaultValue: 'https://placeholder-url.supabase.co',
     ),
-    anonKey: const String.fromEnvironment(
+    publishableKey: const String.fromEnvironment(
       'SUPABASE_ANON_KEY',
       defaultValue: 'placeholder-anon-key-value',
     ),
@@ -30,18 +30,20 @@ class MyApp extends StatelessWidget {
       title: 'Job Finder Agent',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.black,
-          primary: Colors.black,
+          seedColor: const Color(0xFF4F46E5),
+          primary: const Color(0xFF4F46E5),
           brightness: Brightness.light,
         ),
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.white,
-          primary: Colors.white,
+          seedColor: const Color(0xFF1F493D),
+          primary: const Color(0xFF1F493D),
+          surface: const Color(0xFF17382F),
           brightness: Brightness.dark,
         ),
+        scaffoldBackgroundColor: const Color(0xFF1F493D),
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,

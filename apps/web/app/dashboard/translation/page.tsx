@@ -28,6 +28,36 @@ const LANGUAGES = [
   { code: 'en-US', label: 'English (en-US)' }
 ];
 
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: {
+      isFinal: boolean;
+      [index: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
 export default function TranslationPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -50,7 +80,7 @@ export default function TranslationPage() {
   const [browserSupported, setBrowserSupported] = useState(true);
   const [showExtensionHelp, setShowExtensionHelp] = useState(false);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -72,7 +102,9 @@ export default function TranslationPage() {
       }
 
       // Check SpeechRecognition support
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = 
+        (window as Window & { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).SpeechRecognition || 
+        (window as Window & { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).webkitSpeechRecognition;
       if (!SpeechRecognition) {
         setBrowserSupported(false);
       }
@@ -95,7 +127,13 @@ export default function TranslationPage() {
     setTranslation('');
 
     try {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = 
+        (window as Window & { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).SpeechRecognition || 
+        (window as Window & { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setError('Speech recognition is not supported in this browser.');
+        return;
+      }
       const recognition = new SpeechRecognition();
       
       recognition.continuous = true;
@@ -106,7 +144,7 @@ export default function TranslationPage() {
         setIsListening(true);
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         if (event.error === 'not-allowed') {
           setError('Microphone permission denied. Please enable microphone access in your browser settings.');
@@ -120,7 +158,7 @@ export default function TranslationPage() {
         setIsListening(false);
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
@@ -135,8 +173,8 @@ export default function TranslationPage() {
       recognitionRef.current = recognition;
       recognition.start();
 
-    } catch (err: any) {
-      setError(err?.message || 'Failed to start speech recognition');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'Failed to start speech recognition');
       setIsListening(false);
     }
   };
@@ -196,8 +234,8 @@ export default function TranslationPage() {
         }
       }
 
-    } catch (err: any) {
-      setError(err?.message || 'Failed to polish and translate speech.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'Failed to polish and translate speech.');
     } finally {
       setTranslating(false);
     }
@@ -276,7 +314,7 @@ export default function TranslationPage() {
           <div className="pt-2 text-xs border-t border-neutral-200/50 dark:border-neutral-800/30">
             <h4 className="font-bold text-neutral-850 dark:text-white">✦ Inline Selection Translation Feature:</h4>
             <p className="text-neutral-500 leading-relaxed mt-1 font-medium">
-              Once the extension is installed, go to any webpage (like LinkedIn). Highlight any English sentence or requirement with your mouse, and a small <strong>"✦ Translate"</strong> trigger will float right above it. Click it to view the professional translation popup inline instantly!
+              Once the extension is installed, go to any webpage (like LinkedIn). Highlight any English sentence or requirement with your mouse, and a small <strong>&quot;✦ Translate&quot;</strong> trigger will float right above it. Click it to view the professional translation popup inline instantly!
             </p>
           </div>
         </div>

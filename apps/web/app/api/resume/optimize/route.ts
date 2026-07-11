@@ -1,4 +1,34 @@
 import { NextResponse } from 'next/server';
+import { getAuthenticatedUser } from '@/lib/supabase/server';
+
+export async function GET(request: Request) {
+  try {
+    const { user, supabase } = await getAuthenticatedUser(request);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { data: resumeData, error } = await supabase
+      .from('resumes')
+      .select('content')
+      .order('updated_at', { ascending: false })
+      .limit(1);
+
+    if (error) throw error;
+
+    return NextResponse.json(resumeData || []);
+  } catch (err) {
+    console.error('Resume optimize GET error:', err);
+    return NextResponse.json(
+      { error: (err as Error).message || 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -14,8 +44,6 @@ export async function POST(request: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      // Return high-quality, relevant mock data if no Gemini key is provided yet.
-      // We parse the job description for common tech keywords to make it feel realistic.
       const jdLower = jobDescription.toLowerCase();
       const detectedKeywords: string[] = [];
       const commonTechKeywords = [
@@ -29,12 +57,10 @@ export async function POST(request: Request) {
         }
       });
 
-      // Default keywords if none matched
       if (detectedKeywords.length === 0) {
         detectedKeywords.push('ATS Optimization', 'Performance Analytics', 'Microservices');
       }
 
-      // Generate a mock matching score
       const matchPercentage = Math.floor(Math.random() * (90 - 50 + 1)) + 50;
 
       const mockResponse = {
@@ -42,7 +68,7 @@ export async function POST(request: Request) {
         missingKeywords: detectedKeywords,
         suggestedRewrites: [
           {
-            original: resume.personal.summary ? resume.personal.summary.substring(0, 80) + '...' : 'Built web applications.',
+            original: resume.personal?.summary ? resume.personal.summary.substring(0, 80) + '...' : 'Built web applications.',
             suggested: 'Spearheaded full-stack development using modern reactive frameworks, increasing deployment velocity by 25% and improving lighthouse scores.',
             rationale: 'Incorporates action verbs and concrete metrics which appeal to ATS scanners and hiring managers.'
           },
@@ -57,7 +83,6 @@ export async function POST(request: Request) {
       return NextResponse.json(mockResponse);
     }
 
-    // Call Gemini API
     const prompt = `
 You are an expert ATS (Applicant Tracking System) optimizer and hiring director.
 Analyze the following resume JSON and job description. Suggest optimizations to improve keyword match and overall impact.
@@ -123,9 +148,9 @@ Respond strictly with a JSON object in this exact format, with no extra text or 
     const resultJson = JSON.parse(responseText.trim());
     return NextResponse.json(resultJson);
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err?.message || 'Internal server error during optimization' },
+      { error: (err as Error).message || 'Internal server error during optimization' },
       { status: 500 }
     );
   }

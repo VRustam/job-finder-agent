@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Sparkles, Briefcase, FileText, Calendar, Compass, MessageSquare, ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
@@ -8,7 +9,13 @@ export default function LandingPage() {
       <nav className="border-b border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-xs" />
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={36}
+              height={36}
+              className="w-9 h-9 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-xs"
+            />
             <span className="text-xl font-bold tracking-tight">Job Finder Agent</span>
           </div>
           <div className="flex items-center gap-4">

@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1f493d;
+  --foreground: #f6f5f7;
+  --primary-glow: radial-gradient(rgba(120, 119, 198, 0.1), rgba(0, 0, 0, 0));
 }
 
 @theme inline {
@@ -12,15 +13,115 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
+
+/* Awwwards Flowty-inspired Fluid Transitions & Globs */
+
+@keyframes flowtyRotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.flowty-bg-glow {
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.04) 0%, transparent 50%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.flowty-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flowty-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 30px 60px -15px rgba(0, 0, 0, 0.5),
+    0 0 50px 0 rgba(255, 255, 255, 0.03);
+}
+
+@keyframes flowtySlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardPop {
+  0% { opacity: 0; transform: scale(0.96) translateY(24px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-flowty-enter {
+  animation: flowtySlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-card-pop {
+  animation: cardPop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Global skin overrides for #1f493d dashboard shell */
+
+.min-h-screen.bg-\[\#1f493d\] .bg-white.dark\:bg-neutral-900,
+.min-h-screen.bg-\[\#1f493d\] .bg-white,
+.min-h-screen.bg-\[\#1f493d\] .dark\:bg-neutral-900,
+.min-h-screen.bg-\[\#1f493d\] .bg-neutral-900\/90,
+.min-h-screen.bg-\[\#1f493d\] .bg-neutral-950\/95 {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-500,
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-600,
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-700,
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-800,
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-550,
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-750,
+.min-h-screen.bg-\[\#1f493d\] .dark\:text-neutral-400,
+.min-h-screen.bg-\[\#1f493d\] .dark\:text-neutral-350,
+.min-h-screen.bg-\[\#1f493d\] .dark\:text-neutral-300,
+.min-h-screen.bg-\[\#1f493d\] .dark\:text-neutral-250,
+.min-h-screen.bg-\[\#1f493d\] .text-slate-400,
+.min-h-screen.bg-\[\#1f493d\] .text-slate-500 {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-900,
+.min-h-screen.bg-\[\#1f493d\] .dark\:text-white,
+.min-h-screen.bg-\[\#1f493d\] .text-neutral-850 {
+  color: #ffffff !important;
+}
+
+.min-h-screen.bg-\[\#1f493d\] select,
+.min-h-screen.bg-\[\#1f493d\] textarea {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.min-h-screen.bg-\[\#1f493d\] select option {
+  background: #1f493d !important;
+  color: #ffffff !important;
+}
+

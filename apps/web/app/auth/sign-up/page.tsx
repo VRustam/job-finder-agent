@@ -91,8 +91,8 @@ export default function SignUpPage() {
       } else {
         setSuccess(true);
       }
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred during sign up.');
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected error occurred during sign up.');
     } finally {
       setLoading(false);
     }
@@ -108,8 +108,8 @@ export default function SignUpPage() {
         },
       });
       if (oauthError) setError(oauthError.message);
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected OAuth error occurred.');
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected OAuth error occurred.');
     }
   };
 

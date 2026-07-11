@@ -123,9 +123,9 @@ Respond with a JSON array where each object has these exact fields:
       questions: questionsArray
     });
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err?.message || 'Failed to initialize practice session' },
+      { error: (err as Error).message || 'Failed to initialize practice session' },
       { status: 500 }
     );
   }

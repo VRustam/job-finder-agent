@@ -102,9 +102,9 @@ Instructions:
 
     return NextResponse.json({ emailText: responseText.trim() });
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err?.message || 'Internal server error during email generation' },
+      { error: (err as Error).message || 'Internal server error during email generation' },
       { status: 500 }
     );
   }

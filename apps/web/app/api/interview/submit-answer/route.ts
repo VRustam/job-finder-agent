@@ -141,9 +141,9 @@ Respond with a JSON object of this exact schema:
       isFinished
     });
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err?.message || 'Failed to submit answer' },
+      { error: (err as Error).message || 'Failed to submit answer' },
       { status: 500 }
     );
   }

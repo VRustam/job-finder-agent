@@ -19,10 +19,14 @@ function SignInForm() {
   // Read errors or messages from callback redirects
   useEffect(() => {
     const errorParam = searchParams.get('error');
-    if (errorParam === 'auth-callback-failed') {
-      setError('Authentication callback failed. Please try signing in again.');
-    } else if (errorParam) {
-      setError(errorParam);
+    if (errorParam) {
+      Promise.resolve().then(() => {
+        if (errorParam === 'auth-callback-failed') {
+          setError('Authentication callback failed. Please try signing in again.');
+        } else {
+          setError(errorParam);
+        }
+      });
     }
   }, [searchParams]);
 
@@ -54,8 +58,8 @@ function SignInForm() {
         router.push(nextPath);
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
@@ -71,8 +75,8 @@ function SignInForm() {
         },
       });
       if (oauthError) setError(oauthError.message);
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected OAuth error occurred.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'An unexpected OAuth error occurred.');
     }
   };
 

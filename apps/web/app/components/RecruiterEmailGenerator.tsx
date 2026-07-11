@@ -77,8 +77,8 @@ export function RecruiterEmailGenerator({ companyName, jobTitle }: RecruiterEmai
 
       const data = await response.json();
       setEmailText(data.emailText);
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred during email generation.');
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected error occurred during email generation.');
     } finally {
       setLoading(false);
     }

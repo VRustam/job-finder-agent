@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardShell } from '@/app/components/DashboardShell';
 import { 
-  Compass, Play, Calendar, Star, CheckCircle, ChevronRight, 
-  Trash2, AlertCircle, ArrowLeft, Loader2, Sparkles, BookOpen, Send,
+  Compass, Play, Calendar, ChevronRight, 
+  Trash2, AlertCircle, ArrowLeft, Loader2, BookOpen, Send,
   Mic, MicOff
 } from 'lucide-react';
 import Link from 'next/link';
@@ -35,6 +35,36 @@ interface InterviewSession {
   overall_score: number | null;
   created_at: string;
   resume_id: string;
+}
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: {
+      isFinal: boolean;
+      [index: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
 }
 
 interface Resume {
@@ -67,11 +97,13 @@ export default function InterviewCoachPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = React.useRef<any>(null);
+  const recognitionRef = React.useRef<SpeechRecognitionInstance | null>(null);
 
   const startSpeechRecognition = () => {
     try {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = 
+        (window as Window & { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).SpeechRecognition || 
+        (window as Window & { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).webkitSpeechRecognition;
       if (!SpeechRecognition) {
         alert('Web Speech API is not supported in this browser. Please use Chrome or Safari.');
         return;
@@ -86,16 +118,12 @@ export default function InterviewCoachPage() {
         setIsListening(true);
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
 
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
@@ -110,7 +138,7 @@ export default function InterviewCoachPage() {
       recognitionRef.current = recognition;
       recognition.start();
 
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to start speech recognition', err);
       setIsListening(false);
     }
@@ -212,8 +240,8 @@ export default function InterviewCoachPage() {
         // Add to history list
         setSessions(prev => [fullSession as InterviewSession, ...prev]);
       }
-    } catch (err: any) {
-      setError(err?.message || 'Failed to start interview practice.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'Failed to start interview practice.');
     } finally {
       setStartLoading(false);
     }
@@ -268,8 +296,8 @@ export default function InterviewCoachPage() {
         };
       });
 
-    } catch (err: any) {
-      setError(err?.message || 'Failed to evaluate your response.');
+    } catch (err) {
+      setError(err instanceof Error ? (err as Error).message : 'Failed to evaluate your response.');
     } finally {
       setSubmittingAnswer(false);
     }
@@ -720,6 +748,23 @@ export default function InterviewCoachPage() {
                 )}
               </button>
             </form>
+          </div>
+
+          {/* Tutorials & Study Card */}
+          <div className="p-6 bg-gradient-to-r from-purple-500/5 to-transparent border border-purple-500/10 rounded-2xl space-y-3 shadow-sm">
+            <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-purple-500" />
+              Interview Tutorials
+            </h3>
+            <p className="text-[11px] text-neutral-500 leading-relaxed">
+              Study core technology concepts, cheatsheets, and common interview questions before starting your mock session.
+            </p>
+            <Link
+              href="/dashboard/interview/tutorials"
+              className="inline-flex items-center justify-center w-full py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition cursor-pointer"
+            >
+              Study Preparation Guides
+            </Link>
           </div>
         </div>
 

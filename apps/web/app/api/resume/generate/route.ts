@@ -108,9 +108,9 @@ Ensure the output is valid JSON. Do not wrap the JSON output in markdown tags (l
     const generatedResume = JSON.parse(responseText.trim());
     return NextResponse.json(generatedResume);
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err?.message || 'Internal server error during resume generation' },
+      { error: (err as Error).message || 'Internal server error during resume generation' },
       { status: 500 }
     );
   }

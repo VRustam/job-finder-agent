@@ -64,8 +64,8 @@ export default function ResetPasswordPage() {
           router.refresh();
         }, 1500);
       }
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred during password update.');
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected error occurred during password update.');
     } finally {
       setLoading(false);
     }

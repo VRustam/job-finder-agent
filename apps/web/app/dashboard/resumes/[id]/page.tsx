@@ -53,9 +53,10 @@ export default function ResumeEditPage() {
       setShowGenerator(false);
       setGeneratePrompt('');
       alert('Resume auto-generated successfully! Click Save Changes to store it.');
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      alert(err.message || 'Failed to auto-generate resume. Make sure GEMINI_API_KEY is configured.');
+      const errMsg = err instanceof Error ? (err as Error).message : 'Failed to auto-generate resume. Make sure GEMINI_API_KEY is configured.';
+      alert(errMsg);
     } finally {
       setGenerating(false);
     }
@@ -89,6 +90,50 @@ export default function ResumeEditPage() {
 
     loadResume();
   }, [id, supabase, router]);
+
+  const [scale, setScale] = useState(0.5);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const updateScale = () => {
+      if (!containerRef.current) return;
+      const width = containerRef.current.getBoundingClientRect().width;
+      // Subtract padding (e.g. 1.5rem / 24px on each side = 48px)
+      const padding = window.innerWidth < 640 ? 16 : 32;
+      const availableWidth = width - padding;
+      const targetWidth = 794; // Width of 210mm A4 page
+      const nextScale = Math.min(availableWidth / targetWidth, 1);
+      setScale(nextScale);
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    
+    // Also use ResizeObserver for more precise updates on panel toggle/render
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      observer = new ResizeObserver(() => {
+        updateScale();
+      });
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      if (observer) observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && activePane === 'preview') {
+        setActivePane('edit');
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activePane]);
 
   const handleSave = async () => {
     if (!content) return;
@@ -177,7 +222,7 @@ export default function ResumeEditPage() {
             </button>
             <button
               onClick={() => setActivePane('preview')}
-              className={`flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+              className={`lg:hidden flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
                 activePane === 'preview'
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
                   : 'text-neutral-550 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -217,7 +262,7 @@ export default function ResumeEditPage() {
             <h4 className="font-bold text-sm">AI Resume Auto-Builder</h4>
           </div>
           <p className="text-xs text-neutral-300 dark:text-neutral-400 mb-4 font-medium leading-relaxed">
-            Describe the role and experience level you want to target (e.g. "Full Stack Developer resume with 3 years of React/Node.js experience"). Gemini will automatically fill out contact info, experience bullet points, education, projects, and skills.
+            Describe the role and experience level you want to target (e.g. &quot;Full Stack Developer resume with 3 years of React/Node.js experience&quot;). Gemini will automatically fill out contact info, experience bullet points, education, projects, and skills.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
@@ -248,10 +293,20 @@ export default function ResumeEditPage() {
         </div>
       )}
 
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
+
       {/* Editor Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 print:block">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 print:block items-start">
         {/* Left Side: Editor Form */}
-        <div className={`lg:col-span-6 print:hidden ${activePane === 'edit' ? 'block' : 'hidden lg:block'}`}>
+        <div className={`lg:col-span-7 print:hidden animate-fade-in ${activePane === 'edit' ? 'block' : 'hidden'}`}>
           <ResumeForm
             initialContent={content}
             onChange={setContent}
@@ -260,16 +315,34 @@ export default function ResumeEditPage() {
           />
         </div>
 
-        {/* Right Side / Middle Pane: Resume Preview Sheet */}
-        <div className={`lg:col-span-6 overflow-x-auto print:block ${activePane === 'preview' ? 'block' : 'hidden lg:block'}`}>
-          <div className="bg-neutral-100 dark:bg-neutral-950 p-4 sm:p-8 rounded-2xl border border-neutral-200 dark:border-neutral-800/80 shadow-inner flex items-center justify-center min-h-[780px] print:bg-white print:border-none print:shadow-none print:p-0">
-            <ResumePreview content={content} />
-          </div>
+        {/* Left Side: AI Optimizer Form */}
+        <div className={`lg:col-span-7 print:hidden animate-fade-in ${activePane === 'ai' ? 'block' : 'hidden'}`}>
+          <ResumeAIOptimizer resumeContent={content} />
         </div>
 
-        {/* Floating / Right Pane: AI Optimizer */}
-        <div className={`lg:col-span-6 print:hidden ${activePane === 'ai' ? 'block' : 'hidden'}`}>
-          <ResumeAIOptimizer resumeContent={content} />
+        {/* Right Side: Resume Preview Sheet */}
+        <div 
+          ref={containerRef}
+          className={`lg:col-span-5 lg:sticky lg:top-24 print:block ${activePane === 'preview' ? 'block' : 'hidden lg:block'} w-full`}
+        >
+          <div 
+            className="bg-neutral-100 dark:bg-neutral-900/40 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex items-start justify-center print:bg-white print:border-none print:shadow-none print:p-0 transition-all duration-300 overflow-hidden"
+            style={{
+              height: typeof window !== 'undefined' && window.innerWidth >= 1024 ? `calc(${1123 * scale}px + 2rem)` : 'auto',
+              minHeight: '700px',
+            }}
+          >
+            <div 
+              className="origin-top transition-all duration-200 print:transform-none"
+              style={{
+                transform: `scale(${scale})`,
+                width: '794px',
+                minWidth: '794px',
+              }}
+            >
+              <ResumePreview content={content} />
+            </div>
+          </div>
         </div>
       </div>
     </DashboardShell>

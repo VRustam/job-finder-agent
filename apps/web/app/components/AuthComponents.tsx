@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Sparkles } from 'lucide-react';
 
 // --- AuthCard Component ---
 interface AuthCardProps {
@@ -11,19 +12,35 @@ interface AuthCardProps {
 
 export function AuthCard({ children, title, subtitle }: AuthCardProps) {
   return (
-    <div className="w-full max-w-md p-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xl transition-all duration-300">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-            {subtitle}
-          </p>
-        )}
+    <>
+      <style>{`
+        @keyframes authSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .auth-card-glow {
+          animation: authSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.15);
+        }
+      `}</style>
+      <div className="w-full max-w-md p-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl auth-card-glow transition-all duration-300">
+        <div className="text-center mb-8">
+          {/* Decorative Logo Icon */}
+          <div className="w-12 h-12 bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 rounded-2xl flex items-center justify-center mx-auto shadow-md mb-4 rotate-3 hover:rotate-12 transition-transform duration-300">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
+          <h2 className="text-2xl font-black text-neutral-900 dark:text-neutral-50 tracking-tight">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="mt-2.5 text-sm text-neutral-500 dark:text-neutral-450 leading-relaxed">
+              {subtitle}
+            </p>
+          )}
+        </div>
+        {children}
       </div>
-      {children}
-    </div>
+    </>
   );
 }
 
@@ -35,24 +52,24 @@ interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export function AuthInput({ label, error, className = '', id, ...props }: AuthInputProps) {
   return (
-    <div className="mb-4">
+    <div className="mb-5">
       <label
         htmlFor={id}
-        className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5"
+        className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wider"
       >
         {label}
       </label>
       <input
         id={id}
-        className={`w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border ${
+        className={`w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border ${
           error
-            ? 'border-red-500 focus:ring-red-500/20'
-            : 'border-neutral-300 dark:border-neutral-800 focus:ring-neutral-500/20'
-        } rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-4 transition-all duration-200 ${className}`}
+            ? 'border-red-500 focus:ring-red-500/10 focus:border-red-500'
+            : 'border-neutral-250 dark:border-neutral-800 focus:ring-indigo-500/10 focus:border-indigo-650'
+        } rounded-xl text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-4 transition-all duration-250 text-sm ${className}`}
         {...props}
       />
       {error && (
-        <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400">
+        <p className="mt-2 text-xs font-semibold text-red-600 dark:text-red-400">
           {error}
         </p>
       )}
@@ -68,7 +85,7 @@ interface AuthButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 export function AuthButton({ children, className = '', ...props }: AuthButtonProps) {
   return (
     <button
-      className={`w-full py-3 px-4 bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-900 font-semibold rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 focus:outline-none focus:ring-4 focus:ring-neutral-500/20 active:scale-[0.98] transition-all duration-150 ${className}`}
+      className={`w-full py-3.5 px-4 bg-gradient-to-r from-indigo-650 via-purple-650 to-indigo-700 text-white font-bold rounded-xl hover:opacity-95 active:scale-[0.98] transition-all duration-150 shadow-md shadow-indigo-950/10 cursor-pointer text-sm ${className}`}
       {...props}
     >
       {children}
@@ -86,12 +103,12 @@ export function LoadingButton({ loading, children, className = '', ...props }: L
   return (
     <button
       disabled={loading || props.disabled}
-      className={`w-full py-3 px-4 bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-900 font-semibold rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 focus:outline-none focus:ring-4 focus:ring-neutral-500/20 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-all duration-150 flex items-center justify-center ${className}`}
+      className={`w-full py-3.5 px-4 bg-gradient-to-r from-indigo-650 via-purple-650 to-indigo-700 text-white font-bold rounded-xl hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-all duration-150 flex items-center justify-center shadow-md shadow-indigo-950/10 cursor-pointer text-sm ${className}`}
       {...props}
     >
       {loading ? (
         <svg
-          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white dark:text-neutral-900"
+          className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -128,12 +145,12 @@ export function SocialButton({ provider, onClick, className = '', ...props }: So
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 active:scale-[0.98] transition-all duration-150 ${className}`}
+      className={`w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-white dark:bg-neutral-805 border border-neutral-300 dark:border-neutral-800 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 active:scale-[0.98] transition-all duration-150 cursor-pointer ${className}`}
       {...props}
     >
       {isGoogle ? (
         // Google SVG Icon
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
             fill="#4285F4"
@@ -153,11 +170,11 @@ export function SocialButton({ provider, onClick, className = '', ...props }: So
         </svg>
       ) : (
         // Apple SVG Icon
-        <svg className="w-5 h-5 fill-current text-neutral-900 dark:text-neutral-50" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-4 h-4 fill-current text-neutral-900 dark:text-neutral-50" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.95.99-3.09-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.36z" />
         </svg>
       )}
-      <span>Continue with {isGoogle ? 'Google' : 'Apple'}</span>
+      <span>{isGoogle ? 'Google' : 'Apple'}</span>
     </button>
   );
 }
@@ -170,7 +187,7 @@ interface ErrorMessageProps {
 export function ErrorMessage({ message }: ErrorMessageProps) {
   if (!message) return null;
   return (
-    <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg text-sm text-red-600 dark:text-red-400 font-medium">
+    <div className="mb-5 p-3.5 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl text-xs text-red-650 dark:text-red-400 font-bold leading-relaxed">
       {message}
     </div>
   );

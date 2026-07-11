@@ -52,8 +52,8 @@ export function ResumeAIOptimizer({ resumeContent }: ResumeAIOptimizerProps) {
 
       const data = await response.json();
       setResult(data);
-    } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred during optimization.');
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected error occurred during optimization.');
     } finally {
       setLoading(false);
     }

@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getAuthenticatedUser } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user, supabase } = await getAuthenticatedUser(request);
 
-    // If the request doesn't contain a valid session cookie, return unauthorized
     if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Please log in to Job Finder Agent first.' },
@@ -41,9 +39,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, application: data });
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err?.message || 'Failed to sync application from extension' },
+      { error: (err as Error).message || 'Failed to sync application from extension' },
       { status: 500 }
     );
   }
