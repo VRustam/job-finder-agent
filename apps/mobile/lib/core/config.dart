@@ -6,10 +6,7 @@ class AppConfig {
     if (envUrl.isNotEmpty) {
       return envUrl;
     }
-    // Fallback for local development
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2:3000';
-    }
-    return 'http://localhost:3000';
+    // Production server Vercel deployment URL
+    return 'https://job-finder-agent-phi.vercel.app';
   }
 }
