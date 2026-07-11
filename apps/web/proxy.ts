@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateSession } from '@/lib/supabase/middleware';
+import { updateSession } from './lib/supabase/middleware';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const origin = request.headers.get('origin') || '';
   const isAllowed = origin === 'https://www.linkedin.com' || origin.startsWith('chrome-extension://');
   const corsOrigin = isAllowed ? origin : 'https://www.linkedin.com';
