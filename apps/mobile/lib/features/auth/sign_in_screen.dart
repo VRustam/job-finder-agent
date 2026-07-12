@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'sign_up_screen.dart';
 import 'forgot_password_screen.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:crypto/crypto.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/config.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -69,38 +65,11 @@ class _SignInScreenState extends State<SignInScreen> {
       _errorMessage = null;
     });
     try {
-      if (provider == OAuthProvider.apple && Platform.isIOS) {
-        // Native Apple Sign-In on iOS
-        final rawNonce = Supabase.instance.client.auth.generateRawNonce();
-        final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-
-        final credential = await SignInWithApple.getAppleIDCredential(
-          scopes: [
-            AppleIDAuthorizationScopes.email,
-            AppleIDAuthorizationScopes.fullName,
-          ],
-          nonce: hashedNonce,
-        );
-
-        final idToken = credential.identityToken;
-        if (idToken == null) {
-          throw const AuthException(
-            'Could not find ID token from the Apple Sign In.',
-          );
-        }
-
-        await Supabase.instance.client.auth.signInWithIdToken(
-          provider: OAuthProvider.apple,
-          idToken: idToken,
-          nonce: rawNonce,
-        );
-      } else {
-        // Standard Web OAuth Sign-In
-        await Supabase.instance.client.auth.signInWithOAuth(
-          provider,
-          redirectTo: 'ai-career-agent://auth/callback',
-        );
-      }
+      // Use standard Web OAuth Sign-In for all providers
+      await Supabase.instance.client.auth.signInWithOAuth(
+        provider,
+        redirectTo: 'ai-career-agent://auth/callback',
+      );
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
