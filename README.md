@@ -49,7 +49,7 @@ cd apps/web
 npm install
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [https://career-agent-web-rose.vercel.app](https://career-agent-web-rose.vercel.app) in your browser.
 
 ### 2. Mobile App (Flutter)
 Ensure you have the Flutter SDK installed and a running simulator/device:
