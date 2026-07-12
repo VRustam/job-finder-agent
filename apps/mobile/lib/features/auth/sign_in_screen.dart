@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import '../../core/config.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -352,6 +353,14 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Text(
+                      'App Version 1.0.0\nServer: ${AppConfig.backendUrl}',
+                      style: TextStyle(fontSize: 10, color: Colors.grey[500], height: 1.5),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),

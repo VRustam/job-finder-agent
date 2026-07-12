@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/config.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -327,6 +328,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             'Create Account',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Center(
+                  child: Text(
+                    'App Version 1.0.0\nServer: ${AppConfig.backendUrl}',
+                    style: TextStyle(fontSize: 10, color: Colors.grey[500], height: 1.5),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
