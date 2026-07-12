@@ -40,7 +40,7 @@ Create a `.env` file (or set these inside your environment) based on `.env.examp
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+https://career-agent-web-rose.vercel.app
 ```
 
 ### 1. Web App (Next.js)
