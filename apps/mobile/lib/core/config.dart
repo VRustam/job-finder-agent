@@ -7,6 +7,6 @@ class AppConfig {
       return envUrl;
     }
     // Production server Vercel deployment URL
-    return 'https://job-finder-agent-phi.vercel.app';
+    return 'https://career-agent-web-rose.vercel.app';
   }
 }
